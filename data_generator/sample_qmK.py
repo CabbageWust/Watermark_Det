@@ -8,8 +8,8 @@ from xml.etree.ElementTree import SubElement
 
 
 class ImgGenerator(object):
-    def __init__(self, p_mask='./assets/mask.jpg', p_number = './assets/number', p_fore='./fore', p_back='back',
-                 p_save_pic='imgs', p_save_xml='xmls', num=10000):
+    def __init__(self, p_mask='./assets/mask.jpg', p_number = './assets/number', p_fore='./fore', p_back='./back',
+                 p_save_pic='imgs', p_save_xml='xmls', num=100):
         super(ImgGenerator, self).__init__()
         self.mask = p_mask
         self.path_fore = p_fore
@@ -17,6 +17,10 @@ class ImgGenerator(object):
         self.path_number = p_number
         self.path_savepic = p_save_pic
         self.path_savexml = p_save_xml
+        if not os.path.exists(self.path_savexml):
+            os.mkdir(self.path_savexml)
+        if not os.path.exists(self.path_savepic):
+            os.mkdir(self.path_savepic)
         self.num = num
         self._make_fore()
         self._merge()
@@ -66,18 +70,19 @@ class ImgGenerator(object):
                                                    fore[:, :, c],
                                                    back_resize[10:135, 945:1270, c])
 
-            PicName = os.path.basename(back_list[i])
+            PicName = str(count) + '_' + os.path.basename(back_list[i])
             count += 1
             print(count)
             savepath = os.path.join(save_pic_path, PicName)
+            
             cv2.imwrite(savepath, re)
 
             # write xml
-            XmlName = str(count) + "_1014" + ".xml"
+            XmlName = PicName.replace('.jpg', '.xml')
             save_xml = os.path.join(save_xml_path, XmlName)
             x_min, y_min, x_max, y_max = 943, 8, 1272, 72
             obj = [x_min, y_min, x_max, y_max]
-            ImgGenerator.write_xml([obj], PicName, re, save_xml)
+            self.write_xml([obj], PicName, re, save_xml)
 
     @staticmethod
     def write_xml(objs,PicName,Image,save_path):
