@@ -74,7 +74,7 @@ class ImgGenerator(object):
             count += 1
             print(count)
             savepath = os.path.join(save_pic_path, PicName)
-            
+
             cv2.imwrite(savepath, re)
 
             # write xml
